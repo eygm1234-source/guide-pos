@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Guide Store</title>
+
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    button { margin: 6px; padding: 10px; cursor: pointer; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; }
+    .product { border: 1px solid #ccc; padding: 10px; }
+    #sizeModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4);
+    }
+    #sizeBox {
+      background: white;
+      padding: 20px;
+      width: 300px;
+      margin: 120px auto;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- ================= GUIDE VIEW ================= -->
+<div id="guideView">
+
+  <h2>Guide Store</h2>
+
+  <div class="grid" id="productGrid"></div>
+
+  <h3>Cart</h3>
+  <ul id="cart"></ul>
+
+  <p><strong>Total: $<span id="total">0</span></strong></p>
+
+  <button onclick="generateOrderLink()">Generate Order Link</button>
+
+</div>
+
+<!-- ================= SIZE MODAL ================= -->
+<div id="sizeModal">
+  <div id="sizeBox">
+    <h3>Select Size</h3>
+    <div id="sizeButtons"></div>
+    <br>
+    <button onclick="closeSizeModal()">Cancel</button>
+  </div>
+</div>
+
+<script>
+/* ================================================= */
+/* PRODUCT LIST — THIS IS THE ONLY PART YOU EDIT     */
+/* ================================================= */
+
+const products = [
+     {
+      name: "Camiseta hombre – Diablito en bromelia (Azul marino)",
+      price: 15,
+      sizes: ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+    {
+      name: "Camiseta hombre – Ranitomeya (Negra)",
+      price: 15,
+      sizes: ["S", "M", "L", "XL"]
+    },
+    {
+     name: "Camiseta hombre – Ranitomeya (Gris)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL"]
+    },
+       {
+     name: "Camiseta hombre – Ranitomeya (Azul bajo)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL"]
+    },
+       {
+     name: "Camiseta hombre – Ranitomeya (Azul marino)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL"]
+    },
+    {
+      name: "Bolso de tela",
+      price: 12
+    },
+    {
+      name: "Imán de rana",
+      price: 4
+    },
+    {
+      name: "Camiseta mujer – Bromelia (Blanca)",
+      price: 15,
+     sizes: ["XS", "S", "M", "L", "XL", "XXL"]
+     },
+     {
+     name: "Camiseta hombre – Diablito en bromelia (Negra)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL"]
+    },
+    {
+     name: "Camiseta hombre – Diablito en bromelia (café)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL"]
+    },
+    {
+     name: "Camiseta hombre – Diablito en bromelia (Verde)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL"]
+    },
+     {
+     name: "Camiseta hombre – Sitwua en bromelia (Gris ratón)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL"]
+    },
+     {
+     name: "Camiseta hombre – Sitwua en bromelia(Azul añil)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL"]
+    },
+     {
+     name: "Camiseta hombre – Chorrera (Azúl Marino)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL"]
+    },
+   {
+     name: "Camiseta hombre – Chorreara (Café)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL"]
+    },
+     {
+     name: "Camiseta mujer – Arbol",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+     {
+     name: "Camiseta mujer – Diablito (Azúl Marino)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+    {
+     name: "Camiseta mujer – Diablito (Gris ratón)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+    {
+     name: "Camiseta mujer – Diablito (Gris)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+    {
+     name: "Camiseta mujer – Paru (Verde botella)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+    {
+     name: "Camiseta mujer – Paru (Verde Limon)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+    {
+     name: "Camiseta mujer – Paru (Lila)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL"]
+    },
+    {
+     name: "Camiseta mujer – Paru (Celeste)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL", "XXL"]
+    },
+    {
+     name: "Camiseta mujer – Boana (Verde menta)",
+     price: 15,
+     sizes: ["XS", "S", "M", "L", "XL"]
+    },
+    {
+     name: "Blusa mujer – Bromelia (Morada)",
+     price: 15,
+     sizes: ["XS/S/M", "L/XL"]
+    },
+    {
+     name: "Blusa mujer cuello v – Bromelia (Verde)",
+     price: 15,
+     sizes: ["S", "M", "L"]
+    },
+    {
+     name: "Blusa mujer cuello v – Bromelia (Negra)",
+     price: 15,
+     sizes: ["S", "M", "L"]
+    },
+    {
+     name: "SHORT",
+     price: 15,
+     sizes: ["S", "M", "L"]
+    }
+];
+
+/* ================================================= */
+/* SYSTEM MEMORY                                    */
+/* ================================================= */
+
+let cart = [];
+let total = 0;
+let orderNumber = Math.floor(Math.random() * 9000 + 1000);
+let currentProduct = null;
+
+/* ================================================= */
+/* BUILD PRODUCT GRID                               */
+/* ================================================= */
+
+const grid = document.getElementById("productGrid");
+
+products.forEach(p => {
+  const div = document.createElement("div");
+  div.className = "product";
+  div.innerHTML = `<strong>${p.name}</strong><br>$${p.price}`;
+  div.onclick = () => selectProduct(p);
+  grid.appendChild(div);
+});
+
+/* ================================================= */
+/* PRODUCT SELECTION                                */
+/* ================================================= */
+
+function selectProduct(product) {
+  if (product.sizes) {
+    openSizeModal(product);
+  } else {
+    addToCart(product.name, null, product.price);
+  }
+}
+
+/* ================================================= */
+/* SIZE MODAL                                       */
+/* ================================================= */
+
+function openSizeModal(product) {
+  currentProduct = product;
+  const box = document.getElementById("sizeButtons");
+  box.innerHTML = "";
+
+  product.sizes.forEach(size => {
+    const btn = document.createElement("button");
+    btn.textContent = size;
+    btn.onclick = () => {
+      addToCart(product.name, size, product.price);
+      closeSizeModal();
+    };
+    box.appendChild(btn);
+  });
+
+  document.getElementById("sizeModal").style.display = "block";
+}
+
+function closeSizeModal() {
+  document.getElementById("sizeModal").style.display = "none";
+  currentProduct = null;
+}
+
+/* ================================================= */
+/* CART LOGIC                                       */
+/* ================================================= */
+
+function addToCart(name, size, price) {
+  const label = size ? `${name} (${size})` : name;
+
+  const existing = cart.find(i => i.label === label);
+  if (existing) {
+    existing.qty += 1;
+  } else {
+    cart.push({ label, qty: 1 });
+  }
+
+  total += price;
+  renderCart();
+}
+
+function renderCart() {
+  const ul = document.getElementById("cart");
+  ul.innerHTML = "";
+
+  cart.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = `${item.label} x${item.qty}`;
+    ul.appendChild(li);
+  });
+
+  document.getElementById("total").textContent = total.toFixed(2);
+}
+
+/* ================================================= */
+/* GENERATE SHAREABLE ORDER LINK                    */
+/* ================================================= */
+
+function generateOrderLink() {
+
+  if (cart.length === 0) {
+    alert("Cart is empty");
+    return;
+  }
+
+  const orderData = {
+    order: orderNumber,
+    items: cart,
+    total: total
+  };
+
+  const encoded = encodeURIComponent(JSON.stringify(orderData));
+
+  const link =
+    window.location.origin +
+    window.location.pathname +
+    "?order=" + encoded;
+
+  prompt("Copy this order link and send it to the cashier:", link);
+
+  cart = [];
+  total = 0;
+  orderNumber++;
+
+  renderCart();
+}
+
+/* ================================================= */
+/* CASHIER VIEW (AUTO LOAD FROM LINK)                */
+/* ================================================= */
+
+function loadOrderFromLink() {
+  const params = new URLSearchParams(window.location.search);
+  const encoded = params.get("order");
+
+  if (!encoded) return; // normal guide mode
+
+  const data = JSON.parse(decodeURIComponent(encoded));
+
+  document.body.innerHTML = `
+    <h2>Order #${data.order}</h2>
+    <ul>
+      ${data.items.map(i => `<li>${i.label} x${i.qty}</li>`).join("")}
+    </ul>
+    <p><strong>Total: $${data.total.toFixed(2)}</strong></p>
+  `;
+}
+
+loadOrderFromLink();
+</script>
+
+</body>
+</html>
